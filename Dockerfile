@@ -1,24 +1,25 @@
-# Stage 1: Build Stage
+# Perform the extraction in a separate builder container
 FROM bellsoft/liberica-runtime-container:jdk-21-stream-musl AS builder
+WORKDIR /builder
+# This points to the built jar file in the target folder
+# Adjust this to 'build/libs/*.jar' if you're using Gradle
+ARG JAR_FILE=target/*.jar
+# Copy the jar file to the working directory and rename it to application.jar
+COPY ${JAR_FILE} application.jar
+# Extract the jar file using an efficient layout
+RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
-WORKDIR /home/app
-COPY . /home/app/spring-boot-security-angular-client-csrf
-WORKDIR /home/app/spring-boot-security-angular-client-csrf
-RUN  chmod +x mvnw && ./mvnw -Dmaven.test.skip=true clean package
-
-# Stage 2: Layer Tool Stage
-FROM bellsoft/liberica-runtime-container:jdk-21-cds-slim-musl AS optimizer
-
-WORKDIR /home/app
-COPY --from=builder /home/app/spring-boot-security-angular-client-csrf/target/*.jar spring-boot-security-angular-client-csrf.jar
-RUN java -Djarmode=tools -jar spring-boot-security-angular-client-csrf.jar extract --layers --launcher
-
-# Stage 3: Final Stage
+# This is the runtime container
 FROM bellsoft/liberica-runtime-container:jre-21-stream-musl
-
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
-EXPOSE 8080
-COPY --from=optimizer /home/app/spring-boot-security-angular-client-csrf/dependencies/ ./
-COPY --from=optimizer /home/app/spring-boot-security-angular-client-csrf/spring-boot-loader/ ./
-COPY --from=optimizer /home/app/spring-boot-security-angular-client-csrf/snapshot-dependencies/ ./
-COPY --from=optimizer /home/app/spring-boot-security-angular-client-csrf/application/ ./
+WORKDIR /application
+# Copy the extracted jar contents from the builder container into the working directory in the runtime container
+# Every copy step creates a new docker layer
+# This allows docker to only pull the changes it really needs
+COPY --from=builder /builder/extracted/dependencies/ ./
+COPY --from=builder /builder/extracted/spring-boot-loader/ ./
+COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
+COPY --from=builder /builder/extracted/application/ ./
+# Start the application jar - this is not the uber jar used by the builder
+# This jar only contains application code and references to the extracted jar files
+# This layout is efficient to start up and CDS/AOT cache friendly
+ENTRYPOINT ["java", "-jar", "application.jar"]
