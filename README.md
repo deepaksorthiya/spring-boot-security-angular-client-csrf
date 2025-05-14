@@ -32,6 +32,9 @@ cd spring-boot-security-angular-client-csrf
 
 ## Build Project:
 
+In below command, Maven clean phase will delete node packages. check clean plugin config
+in [POM File](pom.xml). Don't use clean phase second time if you don't want to remove node packages.
+
 ```bash
 ./mvnw clean package -DskipTests
 ```
@@ -74,8 +77,10 @@ http://localhost:8080
 
 ## Maven Clean Plugin Config
 
-add below plugin config in [pom.xml](pom.xml) if you want
-to remove directories during clean phase.
+if you want
+to remove node packages during maven clean phase
+add below plugin config in [pom.xml](pom.xml). It's already added.
+you can use
 
 ```
 <plugin>
