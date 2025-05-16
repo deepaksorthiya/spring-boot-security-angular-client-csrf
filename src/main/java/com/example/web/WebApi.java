@@ -46,7 +46,7 @@ public class WebApi {
         return ResponseEntity.ok(user);
     }
 
-    @RequestMapping(method = {RequestMethod.POST, RequestMethod.GET}, value = {"/server-info"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = {RequestMethod.POST, RequestMethod.GET}, value = {"/server-info", "/api/server-info"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, String> getRequestInfo(@RequestHeader Map<String, String> httpHeaders, HttpServletRequest httpServletRequest) {
         httpHeaders.put("remoteHost", httpServletRequest.getRemoteHost());
         httpHeaders.put("localAddress", httpServletRequest.getLocalAddr());
@@ -60,5 +60,10 @@ public class WebApi {
         }
         LOGGER.info("request headers :: {}", httpHeaders);
         return httpHeaders;
+    }
+
+    @PostMapping("/api/post")
+    public ResponseEntity<?> performPostRequest() {
+        return ResponseEntity.ok().body(Map.of("postId", 1, "content", "Hello World"));
     }
 }
