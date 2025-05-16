@@ -1,14 +1,40 @@
 # Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.12.
 
 ## Development server
 
-To start a local development server, run:
+Make sure proxy file is pointing to right backend server. Check Development
+Proxy file [proxy.dev.conf.json](src/proxy.dev.conf.json). It will route all ```/api``` request to backend server
+configure in this file.
+
+```
+{
+  "/api/**": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
+```
+
+To start a local development server, run below command.
+Default configuration is development. Check [angular.json](angular.json)
+
+Run below command from ```src/main/frontend```
 
 ```bash
 ng serve
 ```
+
+for production build to run in local
+
+```bash
+ng serve --configuration production 
+```
+
+this will use [proxy.prod.conf.json](src/proxy.prod.conf.json)
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 

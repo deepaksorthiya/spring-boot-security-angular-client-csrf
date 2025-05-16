@@ -13,6 +13,46 @@
 
 # Getting Started
 
+## Project Information
+
+This project is using [frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin) plugin.
+It will build angular project from directory ```src/main/frontend``` and place build files in
+```frontend/dist/frontend/browser```. Check config in [pom.xml](pom.xml).
+
+```
+<groupId>com.github.eirslett</groupId>
+<artifactId>frontend-maven-plugin</artifactId>
+<version>${frontend-maven-plugin.version}</version>
+<configuration>
+    <workingDirectory>${frontendSrcDir}</workingDirectory>
+</configuration>
+```
+
+Maven Resource plugin will copy this angular build files and
+place it under maven build directory ```/target/classes/static``` as spring boot
+will serve static contents from this directory.
+
+```
+<artifactId>maven-resources-plugin</artifactId>
+<executions>
+    <execution>
+        <id>copy-resources</id>
+        <phase>process-classes</phase>
+        <goals>
+            <goal>copy-resources</goal>
+        </goals>
+        <configuration>
+            <outputDirectory>${basedir}/target/classes/static</outputDirectory>
+            <resources>
+                <resource>
+                    <directory>${frontendSrcDir}/dist/frontend/browser</directory>
+                </resource>
+            </resources>
+        </configuration>
+    </execution>
+</executions>
+```
+
 ## Requirements:
 
 ```
@@ -50,6 +90,10 @@ OR
 ```bash
 java -jar .\target\spring-boot-security-angular-client-csrf-0.0.1-SNAPSHOT.jar
 ```
+
+## Setup Angular Local Development Environment
+
+see [README](src/main/frontend/README.md)
 
 ## (Optional)Build Docker Image(docker should be running):
 
