@@ -17,18 +17,12 @@ export class ApiUrlInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    console.log('Request URL: ' + req.url);
     if (req.url.startsWith('/assets')) {
       return next.handle(req);
     }
-    //const apiUrl = 'http://localhost:8080';
-    const request = req.clone({
-      //url: apiUrl + req.url,
-      withCredentials: true, // Needed since we are using Session Cookies
-    });
 
     return next
-      .handle(request)
+      .handle(req)
       .pipe(
         catchError((error: HttpErrorResponse) => this.handleErrorRes(error))
       );

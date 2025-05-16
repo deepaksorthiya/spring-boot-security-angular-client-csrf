@@ -1,12 +1,18 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, switchMap, tap } from 'rxjs';
+import { Injectable } from '@angular/core';
+import {
+  BehaviorSubject,
+  catchError,
+  Observable,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean | null>(null);
   private currentUserSubject = new BehaviorSubject<any | null>(null);
-
   constructor(private http: HttpClient) {}
 
   checkAuthentication(): Observable<void> {
@@ -14,22 +20,29 @@ export class AuthenticationService {
   }
 
   me(): Observable<any> {
-    return this.http.get<any>('/api/user/me').pipe(
-      tap({
-        next: (user) => {
-          this.isAuthenticatedSubject.next(true);
-          this.currentUserSubject.next(user);
-        },
-        error: () => {
+    return this.http
+      .get<any>('/api/user/me')
+      .pipe(
+        tap({
+          next: (user) => {
+            this.isAuthenticatedSubject.next(true);
+            this.currentUserSubject.next(user);
+          },
+          error: (error) => {
+            // Handle the error here
+            console.error('ERROR from TAP ERROR :: ', error);
+          },
+        })
+      )
+      .pipe(
+        catchError((error) => {
+          // Handle the error here
+          console.error('ERROR from CatchERROR :: ', error);
           this.isAuthenticatedSubject.next(false);
           this.currentUserSubject.next(null);
-        },
-      })
-    );
-  }
-
-  serverInfo(): Observable<any> {
-    return this.http.post<any>('/server-info', {})
+          return of(null);
+        })
+      );
   }
 
   login(username: string, password: string): Observable<any> {
@@ -43,6 +56,14 @@ export class AuthenticationService {
     return this.http
       .post<void>('/api/login', params, { headers })
       .pipe(switchMap(() => this.me()));
+  }
+
+  performPostRequest() {
+    return this.http.post('/api/post', {});
+  }
+
+  getBackendServerInfo() {
+    return this.http.get('/api/server-info');
   }
 
   logout(): Observable<void> {

@@ -1,18 +1,17 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthenticationService } from '../service/authentication.service';
 import { AsyncPipe, JsonPipe } from '@angular/common';
-import {Observable} from 'rxjs';
+import { Component } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { AuthenticationService } from '../service/authentication.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  imports: [JsonPipe, AsyncPipe],
+  imports: [JsonPipe, AsyncPipe, RouterLink],
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
   currentUser$: any;
-  serverInfo$!: Observable<any>;
+  serverInfo: any;
 
   constructor(
     private authService: AuthenticationService,
@@ -30,8 +29,28 @@ export class HomeComponent {
     });
   }
 
-  getServerInfo() {
-    this.serverInfo$ = this.authService.serverInfo();
+  getBackendServerInfo(): void {
+    this.authService.getBackendServerInfo().subscribe({
+      next: (response) => {
+        this.serverInfo = response;
+      },
+      error: (error) => {
+        console.error('Error:', error);
+        alert('Request failed, check the console log for details');
+      },
+    });
   }
 
+  performPostRequest(): void {
+    this.authService.performPostRequest().subscribe({
+      next: (response) => {
+        console.log('Response:', response);
+        alert('Post request successful');
+      },
+      error: (error) => {
+        console.error('Error:', error);
+        alert('Post request failed, check the console log for details');
+      },
+    });
+  }
 }
