@@ -50,7 +50,7 @@ jobs:
 
       - name: Build and push image
         id: push
-        uses: docker/build-push-action@v6.17.0
+        uses: docker/build-push-action@v6.18.0
         with:
           context: .
           build-args: JAR_FILE=target/spring-boot-security-angular-client-csrf-0.0.1-SNAPSHOT.jar
