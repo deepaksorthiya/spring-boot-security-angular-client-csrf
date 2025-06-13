@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -47,7 +51,7 @@ public class WebApi {
     }
 
     @RequestMapping(method = {RequestMethod.POST, RequestMethod.GET}, value = {"/server-info", "/api/server-info"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, String> getRequestInfo(@RequestHeader Map<String, String> httpHeaders, HttpServletRequest httpServletRequest) {
+    public Map<String, String> getRequestInfo(@RequestHeader LinkedHashMap<String, String> httpHeaders, HttpServletRequest httpServletRequest) {
         httpHeaders.put("remoteHost", httpServletRequest.getRemoteHost());
         httpHeaders.put("localAddress", httpServletRequest.getLocalAddr());
         try {
@@ -55,6 +59,9 @@ public class WebApi {
             httpHeaders.put("hostName", localHost.getHostName());
             httpHeaders.put("hostAddress", localHost.getHostAddress());
             httpHeaders.put("canonicalHostName", localHost.getCanonicalHostName());
+            httpHeaders.put("serverLocalDateTime", LocalDateTime.now().toString());
+            httpHeaders.put("serverZonedDateTime", ZonedDateTime.now().toString());
+            httpHeaders.put("serverOffsetDateTime", OffsetDateTime.now().toString());
         } catch (UnknownHostException e) {
             throw new InvalidEndpointRequestException(e.getMessage(), e.getMessage());
         }
