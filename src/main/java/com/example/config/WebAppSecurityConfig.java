@@ -24,13 +24,12 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.*;
-import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,13 +43,13 @@ import java.util.function.Supplier;
 public class WebAppSecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, ServerProperties serverProperties, MvcRequestMatcher.Builder mvc) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ServerProperties serverProperties) throws Exception {
         // https://docs.spring.io/spring-security/reference/5.8/migration/servlet/exploits.html#_i_am_using_angularjs_or_another_javascript_framework
         CookieCsrfTokenRepository tokenRepository = getCookieCsrfTokenRepository(serverProperties);
         // Use only the handle() method of XorCsrfTokenRequestAttributeHandler and the
         // default implementation of resolveCsrfTokenValue() from CsrfTokenRequestHandler
         CsrfTokenRequestHandler requestHandler = new SpaCsrfTokenRequestHandler();
-
+        PathPatternRequestMatcher.Builder mvc = PathPatternRequestMatcher.withDefaults();
         http
                 .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
                 .formLogin(login -> login
@@ -68,7 +67,7 @@ public class WebAppSecurityConfig {
                 )
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         // allow all js css files
-                        .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
+                        .requestMatchers(mvc.matcher("/index.html"), mvc.matcher("/*.js"), mvc.matcher("/*.txt"), mvc.matcher("/*.json"), mvc.matcher("/*.map"), mvc.matcher("/*.css")).permitAll()
                         //allow all actuator endpoints and all static content
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations(), EndpointRequest.toAnyEndpoint()).permitAll()
                         // allow all preflight request
@@ -88,11 +87,6 @@ public class WebAppSecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
-        return new MvcRequestMatcher.Builder(introspector);
     }
 
     private static CookieCsrfTokenRepository getCookieCsrfTokenRepository(ServerProperties serverProperties) {
