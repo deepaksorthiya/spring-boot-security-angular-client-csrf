@@ -3,6 +3,7 @@ name: Publish a Docker image to Github and DockerHub
 on:
   release:
     types: [ published ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,15 +18,24 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 24
-        uses: actions/setup-java@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM JDK 24
+        uses: graalvm/setup-graalvm@v1
         with:
           java-version: '24'
-          distribution: 'temurin'
-          cache: maven
-      - name: Clean Build Test with Maven
-        run: chmod +x mvnw && ./mvnw clean package --file pom.xml --batch-mode --update-snapshots
+          distribution: 'graalvm'
+
+      - name: Check Java Version
+        run: |
+          echo "GRAALVM_HOME: $GRAALVM_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
+          java --version
+          native-image --version
+
+      - name: Create Native Container Image with GraalVM and Maven
+        run: chmod +x mvnw && ./mvnw clean -Pnative spring-boot:build-image -DskipTests --file pom.xml --batch-mode --update-snapshots
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -40,28 +50,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            deepaksorthiya/spring-boot-security-angular-client-csrf
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: push to dockerhub
+        run: docker push deepaksorthiya/spring-boot-security-angular-client-csrf:latest
 
-      - name: Build and push image
-        id: push
-        uses: docker/build-push-action@v6.18.0
-        with:
-          context: .
-          build-args: JAR_FILE=target/spring-boot-security-angular-client-csrf-0.0.1-SNAPSHOT.jar
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Attest
-        uses: actions/attest-build-provenance@v2.4.0
-        id: attest
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          #push-to-registry: true
+      - name: push to github
+        run: |
+          docker tag deepaksorthiya/spring-boot-security-angular-client-csrf:latest ${{ env.REGISTRY }}/deepaksorthiya/spring-boot-security-angular-client-csrf:latest
+          docker push ${{ env.REGISTRY }}/deepaksorthiya/spring-boot-security-angular-client-csrf:latest

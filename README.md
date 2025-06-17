@@ -79,6 +79,14 @@ in [POM File](pom.xml). Don't use clean phase second time if you don't want to r
 ./mvnw clean package -DskipTests
 ```
 
+for native graalvm
+
+```bash
+./mvnw -Pnative native:compile
+```
+
+It will generate a ```spring-boot-security-angular-client-csrf``` in ```target``` folder.
+
 ## Run Project:
 
 ```bash
@@ -91,6 +99,12 @@ OR
 java -jar .\target\spring-boot-security-angular-client-csrf-0.0.1-SNAPSHOT.jar
 ```
 
+for native image run
+
+```bash
+./target/spring-boot-security-angular-client-csrf
+```
+
 ## Setup Angular Local Development Environment
 
 see [README](src/main/frontend/README.md)
@@ -101,10 +115,20 @@ see [README](src/main/frontend/README.md)
 ./mvnw clean spring-boot:build-image -DskipTests
 ```
 
+for native container image
+
+```bash
+./mvnw clean -Pnative spring-boot:build-image -DskipTests
+```
+
+```bash
+docker build --progress=plain -f Dockerfile.native -t deepaksorthiya/spring-boot-security-angular-client-csrf .
+```
+
 ## (Optional)Running On Docker
 
 ```bash
-docker run -p 8080:8080 --name spring-boot-security-angular-client-csrf deepaksorthiya/spring-boot-security-angular-client-csrf:0.0.1-SNAPSHOT
+docker run -p 8080:8080 --name spring-boot-security-angular-client-csrf deepaksorthiya/spring-boot-security-angular-client-csrf
 ```
 
 ## Users for Testing

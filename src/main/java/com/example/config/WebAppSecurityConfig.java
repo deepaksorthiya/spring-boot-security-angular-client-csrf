@@ -3,6 +3,8 @@ package com.example.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
@@ -42,6 +44,8 @@ import java.util.function.Supplier;
 @EnableWebSecurity(/*debug = true*/)
 public class WebAppSecurityConfig {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebAppSecurityConfig.class);
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ServerProperties serverProperties) throws Exception {
         // https://docs.spring.io/spring-security/reference/5.8/migration/servlet/exploits.html#_i_am_using_angularjs_or_another_javascript_framework
@@ -74,7 +78,7 @@ public class WebAppSecurityConfig {
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/server-info").permitAll()
+                        .requestMatchers("/server-info", "/error", "/api/exception").permitAll()
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
@@ -150,6 +154,7 @@ public class WebAppSecurityConfig {
     }
 
     private static void writeToResponse(HttpServletResponse response, HttpStatus httpStatus, Object object) throws IOException {
+        LOGGER.info("calling writeToResponse with status {} and object {}", httpStatus, object);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(httpStatus.value());
 
