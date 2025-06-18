@@ -79,6 +79,13 @@ in [POM File](pom.xml). Don't use clean phase second time if you don't want to r
 ./mvnw clean package -DskipTests
 ```
 
+Use below option if you don't want to build frontend second time.
+Don't use clean phase second otherwise it will delete frontend build as well.
+
+```bash
+./mvnw package -DskipTests -DskipFrontendBuild=true
+```
+
 for native graalvm
 
 ```bash
