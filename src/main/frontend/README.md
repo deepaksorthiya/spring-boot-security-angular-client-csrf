@@ -28,6 +28,15 @@ Run below command from ```src/main/frontend```
 ng serve
 ```
 
+If you chose not to update angular.json, you can pass the proxy configuration file directly in the command:
+Check Documentation
+[Proxy Config Backend](https://angular.dev/tools/cli/serve#proxying-to-a-backend-server) and
+[CLI Options](https://angular.dev/cli/serve)
+
+```bash
+ng serve --proxy-config src/proxy.dev.conf.json
+```
+
 for production build to run in local
 
 ```bash
@@ -35,6 +44,12 @@ ng serve --configuration production
 ```
 
 this will use [proxy.prod.conf.json](src/proxy.prod.conf.json)
+
+OR run from command line via
+
+```bash
+ng serve --proxy-config src/proxy.dev.conf.json
+```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
