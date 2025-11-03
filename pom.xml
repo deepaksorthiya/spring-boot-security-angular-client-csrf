@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
@@ -27,7 +27,7 @@
         <url/>
     </scm>
     <properties>
-        <java.version>24</java.version>
+        <java.version>25</java.version>
         <frontendSrcDir>${project.basedir}/src/main/frontend</frontendSrcDir>
         <frontend-maven-plugin.version>1.15.4</frontend-maven-plugin.version>
         <node.version>v22.15.0</node.version>
@@ -91,14 +91,10 @@
                         <name>deepaksorthiya/${project.artifactId}:latest</name>
                         <publish>false</publish>
                         <createdDate>${maven.build.timestamp}</createdDate>
-                        <!--
-                            In non-native Remove this builder when building docker image using spring-boot:build-image as jdk24
-                            is not support by this builder. Use Dockerfile to create small image
-                        -->
                         <builder>bellsoft/buildpacks.builder:musl</builder>
                         <env>
                             <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-                            <BP_JVM_VERSION>24</BP_JVM_VERSION>
+                            <BP_JVM_VERSION>${java.version}</BP_JVM_VERSION>
                         </env>
                     </image>
                     <layers>
