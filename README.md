@@ -63,11 +63,11 @@ will serve static contents from this directory.
 ## Requirements:
 
 ```
-Git: 2.49.0
-Spring Boot: 3.5.0
+Git: 2.51+
+Spring Boot: 3.5.9
 Maven: 3.9+
-Java: 24
-(Optional)Docker Desktop: Tested on 4.41.0
+Java: 25
+(Optional)Docker Desktop: Tested on 4.54.0
 ```
 
 ## Clone this repository:
