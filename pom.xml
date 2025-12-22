@@ -29,7 +29,7 @@
     <properties>
         <java.version>25</java.version>
         <frontendSrcDir>${project.basedir}/src/main/frontend</frontendSrcDir>
-        <frontend-maven-plugin.version>1.15.4</frontend-maven-plugin.version>
+        <frontend-maven-plugin.version>2.0.0</frontend-maven-plugin.version>
         <node.version>v22.15.0</node.version>
         <npm.version>11.3.0</npm.version>
         <skipFrontendBuild>false</skipFrontendBuild>
