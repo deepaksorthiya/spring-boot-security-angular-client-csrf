@@ -64,7 +64,7 @@ will serve static contents from this directory.
 
 ```
 Git: 2.51+
-Spring Boot: 3.5.10
+Spring Boot: 3.5.11
 Maven: 3.9+
 Java: 25
 (Optional)Docker Desktop: Tested on 4.54.0
