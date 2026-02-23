@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 @Configuration
@@ -94,15 +95,15 @@ public class WebAppSecurityConfig {
 
     private static CookieCsrfTokenRepository getCookieCsrfTokenRepository(ServerProperties serverProperties) {
         CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        cookieCsrfTokenRepository.setCookieCustomizer(cookie -> {
-            // this settings should be change when host is changed other localhost
-            // also will not work when backend and frontend running on different host
-            cookie.sameSite(serverProperties.getServlet().getSession().getCookie().getSameSite().attributeValue());
-            // secure cookie only works with localhost and https
-            cookie.secure(serverProperties.getServlet().getSession().getCookie().getSecure());
-            // setting twice as issue was in old browser
-            cookie.httpOnly(false);
-        });
+//        cookieCsrfTokenRepository.setCookieCustomizer(cookie -> {
+//            // this settings should be change when host is changed other localhost
+//            // also will not work when backend and frontend running on different host
+//            cookie.sameSite(serverProperties.getServlet().getSession().getCookie().getSameSite().attributeValue());
+//            // secure cookie only works with localhost and https
+//            cookie.secure(serverProperties.getServlet().getSession().getCookie().getSecure());
+//            // setting twice as issue was in old browser
+//            cookie.httpOnly(false);
+//        });
         return cookieCsrfTokenRepository;
     }
 
@@ -184,12 +185,13 @@ public class WebAppSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedHeader("*");
-        config.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of(CorsConfiguration.ALL));
+        config.setAllowedMethods(List.of(CorsConfiguration.ALL));
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost",
                 "http://localhost:4200",
                 "http://localhost:8080",
+                "https://render.com",
                 "https://spring-angular-csrf-frontend.onrender.com",
                 "https://spring-ren-prod-angular-nested-routing.onrender.com"
         ));
