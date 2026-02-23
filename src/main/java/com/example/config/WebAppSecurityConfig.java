@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 @Configuration
@@ -184,12 +185,14 @@ public class WebAppSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedHeader("*");
-        config.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of(CorsConfiguration.ALL));
+        config.setAllowedMethods(List.of(CorsConfiguration.ALL));
+        config.setExposedHeaders(List.of(CorsConfiguration.ALL));
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost",
                 "http://localhost:4200",
                 "http://localhost:8080",
+                "https://render.com",
                 "https://spring-angular-csrf-frontend.onrender.com",
                 "https://spring-ren-prod-angular-nested-routing.onrender.com"
         ));
